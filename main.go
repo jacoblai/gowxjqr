@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	proto "github.com/golang/protobuf/proto"
+	"wx"
 )
 
 var (
@@ -14,7 +15,7 @@ var (
 
 func main() {
 	var bRet bool
-	bRet, sDns, lDns = getDns()
+	bRet, sDns, lDns = wx.GetDns()
 	if !bRet {
 		fmt.Println("提取长、短链接DNS出错！")
 		return
@@ -22,7 +23,7 @@ func main() {
 	fmt.Println(sDns)
 	fmt.Println(lDns)
 
-	bRet, priKey, pubKey = GenEcdhKey()
+	bRet, priKey, pubKey = wx.GenEcdhKey()
 	if !bRet {
 		fmt.Println("初始化出错！")
 		return
@@ -33,18 +34,18 @@ func main() {
 
 	var l int32 = 16
 	var nid int32 = 713
-	var login_aes_key []byte = RandomStr(16)
+	var login_aes_key []byte = wx.RandomStr(16)
 	var pubKeyLen int32 = int32(len(pubKey))
 	var username string = "yydhsb"
-	var password string = GetMd5("te8780511")
-	accountRequest := ManualAuthAccountRequest{
-		Aes: &ManualAuthAccountRequest_AesKey{
+	var password string = wx.GetMd5("te8780511")
+	accountRequest := wx.ManualAuthAccountRequest{
+		Aes: &wx.ManualAuthAccountRequest_AesKey{
 			Len: &l,
 			Key: login_aes_key,
 		},
-		Ecdh: &ManualAuthAccountRequest_Ecdh{
+		Ecdh: &wx.ManualAuthAccountRequest_Ecdh{
 			Nid: &nid,
-			EcdhKey: &ManualAuthAccountRequest_Ecdh_EcdhKey{
+			EcdhKey: &wx.ManualAuthAccountRequest_Ecdh_EcdhKey{
 				Len: &pubKeyLen,
 				Key: pubKey,
 			},
@@ -72,8 +73,8 @@ func main() {
 	var deviceModel string = "Xarmeabi-v7a"
 	var osType string = "android-22"
 	var realCountry string = "cn"
-	deviceRequest := ManualAuthDeviceRequest{
-		Login: &LoginInfo{
+	deviceRequest := wx.ManualAuthDeviceRequest{
+		Login: &wx.LoginInfo{
 			AesKey:     login_aes_key,
 			Uin:        &uZero,
 			Guid:       &guid,
@@ -81,7 +82,7 @@ func main() {
 			AndroidVer: &androidver,
 			Unknown:    &uOne,
 		},
-		Tag2:            &ManualAuthDeviceRequest__Tag2{},
+		Tag2:            &wx.ManualAuthDeviceRequest__Tag2{},
 		Imei:            &imei,
 		SoftInfoXml:     &softInfoXml,
 		Unknown5:        &uZero,
@@ -118,8 +119,8 @@ func main() {
 	fmt.Println(devData)
 	fmt.Println("-------------devData-------------")
 
-	reqAccount, _ := CompressAndRsaEnc(accData)
-	reqDevice, _ := CompressAndAesEnc(devData, login_aes_key)
+	reqAccount, _ := wx.CompressAndRsaEnc(accData)
+	reqDevice, _ := wx.CompressAndAesEnc(devData, login_aes_key)
 	fmt.Println(reqAccount)
 	fmt.Println(reqDevice)
 }
